@@ -77,10 +77,9 @@ class CovidTable extends React.Component {
             </div>
             <div className="site-card-border-less-wrapper">
                <Card title="Global Covid Stats" bordered={false}>
-               <iframe src="https://ourworldindata.org/grapher/total-cases-covid-19?tab=map" width="100%" height="700px" title="Covid Chart"></iframe>
+                  <iframe src="https://ourworldindata.org/grapher/total-cases-covid-19?tab=map" width="100%" height="700px" title="Covid Chart"></iframe>
                </Card>
             </div>
-            
          </div>
       );
    }

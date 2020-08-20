@@ -93,6 +93,15 @@ class CovidChart extends React.Component {
       });
    }
 
+   check = (event) => {
+      if((event.target.value === '')){
+         this.setState({
+            searchResult: [],
+            search: false
+         });
+      }
+   }
+
    render() {
       const displayData = this.props.countries;
 
@@ -167,7 +176,7 @@ class CovidChart extends React.Component {
                            </div>
                            <div className="filter">
                               <Text>Search By: </Text>
-                              <Search style={{ width: '200px' }} placeholder="Search By Country Name" onSearch={(value) => this.searchField(value)} />
+                              <Search style={{ width: '200px' }} placeholder="Search By Country Name" onSearch={(value) => this.searchField(value)} onChange={this.check}/>
                            </div>
                         </div>
                         <Table dataSource={this.state.dataSource} columns={columns} />
@@ -198,7 +207,7 @@ class CovidChart extends React.Component {
                         </div>
                         <div className="filter">
                            <Text>Search By: </Text>
-                           <Search style={{ width: '200px' }} placeholder="Search By Country Name" onSearch={(value) => this.searchField(value)} />
+                           <Search style={{ width: '200px' }} placeholder="Search By Country Name" onSearch={(value) => this.searchField(value)} onChange={this.check} />
                         </div>
                      </div>
                      <Table dataSource={this.state.searchResult} columns={columns} />

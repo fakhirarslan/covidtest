@@ -44,15 +44,14 @@ code {
 .cont .filter {
   margin-left: auto;
   padding: 10px;
-  padding-right: 400px;
+  padding-right: 200px;
 }
 
 .cont .sorter {
   padding: 10px;
-  padding-left: 400px;
+  padding-left: 200px;
 }
 
 .ant-carousel {
   margin-top: auto;
-
 }
