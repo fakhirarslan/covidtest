@@ -1,77 +1,9 @@
 import React from 'react';
 import { Table, Card, Input, Typography, Select } from 'antd';
-import { axiosCall } from '../Utilities/Axios/axios';
-import { connect } from 'react-redux';
-import { getSpecific } from '../Store/Actions/getSpecific';
-import Specific from './Specific';
 
 const { Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
-
-const mapStateToProps = (state) => {
-   return {
-      allData: state
-   };
-}
-
-const columns = [
-   {
-      title: 'Country',
-      dataIndex: 'country',
-      key: 'country',
-   },
-   {
-      title: 'Active Cases',
-      dataIndex: 'active',
-      key: 'active',
-   },
-   {
-      title: 'Total Cases',
-      dataIndex: 'cases',
-      key: 'cases',
-   },
-   {
-      title: 'Critical Cases',
-      dataIndex: 'critical',
-      key: 'critical',
-   },
-   {
-      title: 'Total Deaths',
-      dataIndex: 'deaths',
-      key: 'deaths',
-   },
-   {
-      title: 'Recovered',
-      dataIndex: 'recovered',
-      key: 'recovered',
-   },
-   {
-      title: "Today's Cases",
-      dataIndex: 'todayCases',
-      key: 'todayCases',
-   },
-   {
-      title: "Today's Deaths",
-      dataIndex: 'todayDeaths',
-      key: 'todayDeaths',
-   },
-   {
-      title: "Today's Recovered",
-      dataIndex: 'todayRecovered',
-      key: 'todayRecovered',
-   },
-   {
-      title: "Flag",
-      dataIndex: 'flag',
-      key: 'flag',
-      render: text => <img src={text} alt={text} style={{ height: '40px', width: '40px', borderRadius: '50%' }} />
-   },
-];
-
-
-
-
 
 class CovidChart extends React.Component {
 
@@ -80,7 +12,9 @@ class CovidChart extends React.Component {
 
       this.state = {
          searchName: '',
-         dataSource: []
+         dataSource: [],
+         searchResult: [],
+         search: false
       }
    }
 
@@ -109,7 +43,6 @@ class CovidChart extends React.Component {
 
    handleChange = (value) => {
       this.setState({ dataSource: this.sortData(this.state.dataSource, value) })
-      console.log(this.state.dataSource);
    }
 
    alphaSort = () => {
@@ -139,6 +72,8 @@ class CovidChart extends React.Component {
             return data.slice().sort((a, b) => a.active - b.active);
          } else if (value === 'Alphabatic') {
             return this.alphaSort();
+         } else if (value === 'TodayCases') {
+            return data.slice().sort((a, b) => a.todayCases - b.todayCases);
          }
       }
    }
@@ -146,28 +81,77 @@ class CovidChart extends React.Component {
    searchField = (value) => {
       this.setState({
          searchName: value,
-
       });
-      const { dispatch } = this.props;
-      axiosCall.get('/countries/' + value).then((res) => {
-         dispatch(getSpecific(res.data));
-      }).catch((err) => {
-         console.log(err);
-      })
-
+      this.state.dataSource.map((k) => {
+         if (k.country === value) {
+            this.setState({
+               searchResult: [k],
+               search: true
+            });
+         }
+         return '';
+      });
    }
 
    render() {
       const displayData = this.props.countries;
-      const countryData = this.props.allData.country.country;
-      console.log(countryData);
-      console.log(countryData.length === 0);
 
+      const columns = [
+         {
+            title: 'Country',
+            dataIndex: 'country',
+            key: 'country',
+         },
+         {
+            title: 'Active Cases',
+            dataIndex: 'active',
+            key: 'active',
+         },
+         {
+            title: 'Total Cases',
+            dataIndex: 'cases',
+            key: 'cases',
+         },
+         {
+            title: 'Critical Cases',
+            dataIndex: 'critical',
+            key: 'critical',
+         },
+         {
+            title: 'Total Deaths',
+            dataIndex: 'deaths',
+            key: 'deaths',
+         },
+         {
+            title: 'Recovered',
+            dataIndex: 'recovered',
+            key: 'recovered',
+         },
+         {
+            title: "Today's Cases",
+            dataIndex: 'todayCases',
+            key: 'todayCases',
+         },
+         {
+            title: "Today's Deaths",
+            dataIndex: 'todayDeaths',
+            key: 'todayDeaths',
+         },
+         {
+            title: "Today's Recovered",
+            dataIndex: 'todayRecovered',
+            key: 'todayRecovered',
+         },
+         {
+            title: "Flag",
+            dataIndex: 'flag',
+            key: 'flag',
+            render: text => <img src={text} alt={text} style={{ height: '40px', width: '40px', borderRadius: '50%' }} />
+         },
+      ];
 
-      if (countryData.length === 0 && this.state.searchName.length <= 0) {
+      if (!this.state.search) {
          if (displayData) {
-
-
             return (
                <div>
                   <div className="site-card-border-less-wrapper">
@@ -178,6 +162,7 @@ class CovidChart extends React.Component {
                               <Select defaultValue="Alphabatic" style={{ width: 120 }} onChange={this.handleChange}>
                                  <Option value="Alphabatic">Alphabetic</Option>
                                  <Option value="ActiveCases">Active Cases</Option>
+                                 <Option value="TodayCases">Today's Cases</Option>
                               </Select>
                            </div>
                            <div className="filter">
@@ -197,32 +182,32 @@ class CovidChart extends React.Component {
                </div>
             );
          }
-      } else if (countryData.length === 0 && this.state.searchName.length > 0) {
+      } else {
          return (
             <div>
                <div className="site-card-border-less-wrapper">
                   <Card title="Country Wise Covid Information" bordered={false}>
-                     <div>
-                        <div>
+                     <div className="cont">
+                        <div className="sorter">
                            <Text>Sort By: </Text>
-                           <Select defaultValue="Alphabetic" style={{ width: 120 }} onChange={this.handleChange}>
+                           <Select defaultValue="Alphabatic" style={{ width: 120 }} onChange={this.handleChange}>
+                              <Option value="Alphabatic">Alphabetic</Option>
                               <Option value="ActiveCases">Active Cases</Option>
+                              <Option value="TodayCases">Today's Cases</Option>
                            </Select>
                         </div>
-                        <div>
+                        <div className="filter">
                            <Text>Search By: </Text>
                            <Search style={{ width: '200px' }} placeholder="Search By Country Name" onSearch={(value) => this.searchField(value)} />
                         </div>
                      </div>
-                     <Table columns={columns} />
+                     <Table dataSource={this.state.searchResult} columns={columns} />
                   </Card>
                </div>
             </div>
          );
-      } else {
-         return (<Specific country={countryData} />);
       }
    }
 }
 
-export default connect(mapStateToProps)(CovidChart);
+export default CovidChart;
